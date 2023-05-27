@@ -72,14 +72,14 @@ function Register() {
 
 
   return (
-    <div className="bg-gray-600 flex flex-col items-center justify-center min-h-screen md:py-2">
+    <div className="bg-gray-700 flex flex-col items-center justify-center min-h-screen md:py-2">
       <main className="flex items-center w-full px-2 md:px-20">
         <div className="hidden md:inline-flex flex-col flex-1 space-y-1">
-          <p className='text-6xl text-blue-500 font-bold'>Rubbish Revolution</p>
-          <p className='font-medium text-lg leading-1 text-primary'>Stop the pollution. Be part of the solution.</p>
+          <p className='text-6xl text-blue-500 font-bold'>Gym Trainer</p>
+          <p className='font-medium text-xl leading-1 text-primary'>Personalized Workout Training Expert.</p>
         </div>
         <div className="bg-primary text-black rounded-2xl shadow-2xl  flex flex-col w-full  md:w-1/3 items-center max-w-4xl transition duration-1000 ease-in">
-          <h2 className='p-3 text-3xl font-bold text-white'>Rubbish Revolution</h2>
+          <h2 className='p-3 text-3xl font-bold text-white'>Gym Trainer</h2>
           <div className="inline-block border-[1px] justify-center w-20 border-white border-solid"></div>
           <h3 className='text-xl font-semibold text-white pt-2'>Create Account!</h3>
           <div className='flex space-x-2 m-4 items-center justify-center'>
