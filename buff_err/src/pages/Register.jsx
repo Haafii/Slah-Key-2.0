@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+// import { createUserWithEmailAndPassword } from 'firebase/auth';
+// import { auth } from '../firebase';
 import { Facebook, GitHub, Google } from '@mui/icons-material'
 // import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/database';
+// import 'firebase/auth';
+// import 'firebase/database';
 
 function Register() {
   const navigate = useNavigate();
@@ -15,32 +15,32 @@ function Register() {
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState("");
   const [error, setError] = useState('');
 
-  const onSubmit = async (e) => {
-    e.preventDefault()
-    if (password !== registerConfirmPassword) {
-      setError('Passwords do not match')
-      return
-    }
-    await createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        // console.log(user);
-        navigate("/")
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-        if (errorMessage.includes("already")) {
-          setError("You already have an account")
-        } else if (errorMessage.includes("Password")) {
-          setError("Week password")
-        }
-        else {
-          setError("let me check")
-        }
-      });
-    }
+  // const onSubmit = async (e) => {
+  //   e.preventDefault()
+  //   if (password !== registerConfirmPassword) {
+  //     setError('Passwords do not match')
+  //     return
+  //   }
+  //   await createUserWithEmailAndPassword(auth, email, password)
+  //     .then((userCredential) => {
+  //       const user = userCredential.user;
+  //       // console.log(user);
+  //       navigate("/")
+  //     })
+  //     .catch((error) => {
+  //       const errorCode = error.code;
+  //       const errorMessage = error.message;
+  //       console.log(errorCode, errorMessage);
+  //       if (errorMessage.includes("already")) {
+  //         setError("You already have an account")
+  //       } else if (errorMessage.includes("Password")) {
+  //         setError("Week password")
+  //       }
+  //       else {
+  //         setError("let me check")
+  //       }
+  //     });
+  //   }
 
   // const onSubmit = async (e) => {
   //   e.preventDefault()
@@ -69,6 +69,40 @@ function Register() {
   //       }
   //     });
   //   }
+
+  const onSubmit = async (e) => {
+    e.preventDefault()
+    if (password !== registerConfirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+    let update = {
+      Name: registerName,
+      email: email,
+      password: password,
+
+    };
+
+    var requestOptions = {
+      method: 'POST',
+      body: JSON.stringify(update),
+      headers: {
+        "content-type": "application/json"
+      }
+    };
+    fetch("https://rr-api-00ld.onrender.com/user", requestOptions)
+      .then(response => response.json())
+      .then(result => {
+        console.log(result)
+        if (result) {
+          navigate("/");
+        }
+      })
+      .catch(error => {
+        // console.log('error', error)
+        setError("Sign up failed. Please try again.")
+      });
+  }
 
 
   return (

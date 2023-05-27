@@ -1,11 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from "../components/Header";
 import { Link } from "react-router-dom";
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const Home = () => {
+
+  const [username, setUsername] = useState("");
+  // Retrieve the user ID from local storage
+  const userId = localStorage.getItem('userId');
+
+  var myHeaders = new Headers();
+  myHeaders.append("Authorization", `bearer ${userId}`);
+
+  var requestOptions = {
+    method: 'GET',
+    headers: myHeaders,
+    redirect: 'follow'
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("https://rr-api-00ld.onrender.com/users/me/", requestOptions);
+        const result = await response.json();
+        setUsername(result.name);
+      } catch (error) {
+        console.log('error', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
   const [height, setHeight] = useState(0);
   const [weight, setWeight] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
+  const isCompleted = true;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -23,6 +55,50 @@ const Home = () => {
     setShowDetails(true);
   };
 
+  function DietListItem({ itemName, isCompleted, onToggle }) {
+    return (
+      <li>
+        <input
+          type="checkbox"
+          checked={isCompleted}
+          onChange={onToggle}
+          className="mr-2"
+        />
+        {isCompleted ? (
+          <CheckIcon className="mr-2 text-green-500" />
+        ) : (
+          <ClearIcon className="mr-2 text-red-500" />
+        )}
+        {itemName}
+      </li>
+    );
+  }
+
+
+
+  // function WorkoutListItem({ itemName, isCompleted, onToggle }) {
+  //   return (
+  //     <li>
+
+  //       {isCompleted ? (
+  //         <CheckIcon className="mr-2 text-green-500" />
+  //       ) : (
+  //         <ClearIcon className="mr-2 text-red-500" />
+  //       )}
+  //       {itemName}
+  //     </li>
+  //   );
+  // }
+
+
+  const [completedList, setCompletedList] = useState([]);
+
+  const handleToggle = (index) => {
+    const updatedList = [...completedList];
+    updatedList[index] = !updatedList[index];
+    setCompletedList(updatedList);
+  };
+
   return (
     <div>
       <Header />
@@ -37,7 +113,7 @@ const Home = () => {
               alt="Profile"
             />
             <div>
-              <h3 className="text-lg font-semibold">John Doe</h3>
+              <h3 className="text-lg font-semibold">{username}</h3>
               <p className="text-gray-600">Software Engineer</p>
             </div>
           </div>
@@ -79,16 +155,64 @@ const Home = () => {
       </div>
 
       {showDetails && (
-        <div className="flex h-1/2 bg-gray-200 p-4 rounded items-center flex-col ">
+        <div className="flex bg-gray-200 p-4 rounded items-center flex-col ">
           <p className="text-gray-600 text-sm">Height: {height} cm</p>
           <p className="text-gray-600 text-sm">Weight: {weight} kg</p>
+          <div className='flex flex-col md:flex-row justify-evenly w-full'>
+            <div>
+              <h2 className="text-lg font-bold mb-2">Today's Workout</h2>
+              <ul className="mt-4">
+                <li>
+                  {isCompleted ? (
+                    <CheckIcon className="mr-2 text-green-500" />
+                  ) : (
+                    <ClearIcon className="mr-2  text-red-500" />
+                  )}
+                  Pushup 10 times
+                </li>
+                <li>
+                  {isCompleted ? (
+                    <CheckIcon className="mr-2 text-green-500" />
+                  ) : (
+                    <ClearIcon className="mr-2  text-red-500" />
+                  )}
+                  List Item 1
+                </li>
+                <li>
+                  {isCompleted ? (
+                    <CheckIcon className="mr-2 text-green-500" />
+                  ) : (
+                    <ClearIcon className="mr-2  text-red-500" />
+                  )}
+                  List Item 1
+                </li>
+                {/* Add more list items as needed */}
+              </ul>
+            </div>
 
-          <ul className="mt-4">
-            <li>List Item 1</li>
-            <li>List Item 2</li>
-            <li>List Item 3</li>
-            {/* Add more list items as needed */}
-          </ul>
+            <div>
+              <h2 className="text-lg font-bold mb-2">Today's Diet</h2>
+              <ul className="mt-4">
+                <DietListItem
+                  itemName="don't drink water today"
+                  isCompleted={completedList[0]}
+                  onToggle={() => handleToggle(0)}
+                />
+                <DietListItem
+                  itemName="don't sleep today"
+                  isCompleted={completedList[1]}
+                  onToggle={() => handleToggle(1)}
+                />
+                <DietListItem
+                  itemName="don't eat food today"
+                  isCompleted={completedList[2]}
+                  onToggle={() => handleToggle(2)}
+                />
+                {/* Add more ListItems and corresponding array elements as needed */}
+              </ul>
+            </div>
+          </div>
+
           <Link to={"workout"}>
             <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 mt-4 px-4 rounded-md" >
               Get Started

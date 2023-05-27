@@ -1,31 +1,76 @@
 import React, { useState, useEffect } from 'react'
 import { Facebook, GitHub, Google } from '@mui/icons-material'
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth, provider } from '../firebase';
+// import { signInWithEmailAndPassword } from 'firebase/auth';
+// import { auth, provider } from '../firebase';
 
 // import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState('');
-  const onLogin = (e) => {
-    e.preventDefault();
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        navigate("/home")
-        // console.log(user);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onLogin = (event) => {
+    setIsLoading(true);
+    event.preventDefault();
+    var formdata = new FormData();
+    formdata.append("username", username);
+    formdata.append("password", password);
+
+    var requestOptions = {
+      method: 'POST',
+      body: formdata,
+      redirect: 'follow'
+    };
+
+    // Declare the result variable
+    let result = null;
+
+    fetch("https://rr-api-00ld.onrender.com/login", requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        result = data; // Assign the response data to the result variable
+        // console.log(result);
+        // console.log(result.access_token);
+        const userId = result.access_token; // User ID received from the server
+        localStorage.setItem('userId', userId);
+        // console.log(userId);
+
+        // Check if the result meets the condition for validating persons
+        if (result && result.access_token && result.access_token.length > 0) {
+          navigate("/home");
+        } else {
+          setError("Invalid username or password")
+        }
+        setIsLoading(false);
       })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        setError("Enter a valid email or password")
-        // console.log(errorCode, errorMessage)
+      .catch(error => {
+        console.log(error);
+        setError("Login failed. Please try again."); // Set an error message to display on the login page.
+        setIsLoading(false);
       });
-  }
+  };
+
+
+
+  // const onLogin = (e) => {
+  //   e.preventDefault();
+  //   signInWithEmailAndPassword(auth, email, password)
+  //     .then((userCredential) => {
+  //       const user = userCredential.user;
+  //       navigate("/home")
+  //       // console.log(user);
+  //     })
+  //     .catch((error) => {
+  //       const errorCode = error.code;
+  //       const errorMessage = error.message;
+  //       setError("Enter a valid email or password")
+  //       // console.log(errorCode, errorMessage)
+  //     });
+  // }
   // useEffect(() => {
   //   const googleLoginButton = document.getElementById('google-login');
   //   googleLoginButton.addEventListener('click', () => {
@@ -72,13 +117,13 @@ const Login = () => {
           <form onSubmit={onLogin}>
             <div className='flex flex-col items-center justify-center'>
               <input
-                type='email'
+                type='text'
                 className='rounded-2xl px-2 py-1 w-4/5 md:w-full border-[1px]  m-1 focus:shadow-md  focus:outline-none focus:ring-0'
-                placeholder='Email'
-                onChange={(e) => { setEmail(e.target.value), setError(null) }}
+                placeholder='Username'
+                onChange={(e) => { setUsername(e.target.value), setError(null) }}
                 required
-                id="email-address"
-                name="email"
+                id="username"
+                name="username"
               />
               <input
                 type="password"
@@ -92,8 +137,14 @@ const Login = () => {
               {error && <div className='text-red-600 text-sm '>{error}</div>}
               <button
                 type="submit"
-                className='rounded-2xl my-4 text-white bg-sky-500 w-full px-6 py-2 shadow-md hover:text-secondary hover:bg-sky-600 transition duration-200 ease-in'>
-                Sign In
+                className='rounded-2xl my-4 text-white bg-sky-500 w-full px-6 py-2 shadow-md hover:text-secondary hover:bg-sky-600 transition duration-200 ease-in'
+                disabled={isLoading} // Disable the button during loading
+              >
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mx-auto"></div> // Loading spinner
+                ) : (
+                  'Sign In'
+                )}
               </button>
             </div>
           </form>
