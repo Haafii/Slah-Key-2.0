@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import Header from "./components/Header";
+import Header from "../components/Header";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [height, setHeight] = useState(0);
@@ -88,9 +89,12 @@ const Home = () => {
             <li>List Item 3</li>
             {/* Add more list items as needed */}
           </ul>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 mt-4 px-4 rounded-md" >
-            Get Started
-          </button>
+          <Link to={"workout"}>
+            <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 mt-4 px-4 rounded-md" >
+              Get Started
+            </button>
+          </Link>
+
         </div>
       )}
     </div>
